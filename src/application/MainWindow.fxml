@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane minHeight="600.0" minWidth="800.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.60" fx:controller="application.MainWindowController">
+   <children>
+      <TextArea fx:id="logText" layoutX="386.0" layoutY="14.0" prefHeight="500.0" prefWidth="400.0" />
+      <TableView fx:id="table" editable="true" layoutX="9.0" layoutY="14.0" prefHeight="500.0" prefWidth="372.0" />
+   </children>
+</AnchorPane>
