@@ -1,8 +1,5 @@
 package application;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,24 +10,26 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.TextFieldTableCell;
+import models.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 
 public class MainWindowController
 {
 	@FXML private TextArea logText;
-	@FXML private TableView<List<SimpleStringProperty>> table;
+	@FXML private TableView<TableRow> table;
 	
-	private TableData data;
-	private List<String> titles;
-	private ObservableList<List<SimpleStringProperty>> data = FXCollections.observableArrayList();
+	private ObservableList<TableRow> data;
+	
 	private int citiesCount = 0;
 	private int lastCityNumber = 0;
 	
 	private ContextMenu cellContext;
 	
 	public MainWindowController()
-	{
+	{		
+		data = FXCollections.observableArrayList();
+		
 		cellContext = new ContextMenu();
 		MenuItem remove = new MenuItem("Убрать город на вертикали");
 		MenuItem toggle = new MenuItem("Сделать (не)активным");
@@ -59,10 +58,11 @@ public class MainWindowController
 		table.setItems(data);
 		table.setContextMenu(cellContext);
 		table.getSelectionModel().setCellSelectionEnabled(true);
-				
-		titles = new ArrayList<>();
-		titles.add("Город");		
-		table.getColumns().add(createColumn(titles.get(0), 0));
+		
+		TableColumn<TableRow, String> headerColumn = createColumn("Город", -1);
+		headerColumn.setEditable(false);
+		
+		table.getColumns().add(headerColumn);
 		
 		for (int i=0; i<3; i++)
 			addItem();
@@ -70,13 +70,13 @@ public class MainWindowController
 	
 	private void addItem()
 	{
-		List<SimpleStringProperty> list = new ArrayList<>();
-		list.add(new SimpleStringProperty("A" + (lastCityNumber+1)));
+		TableRow row = new TableRow();
+		row.title.set("A" + (lastCityNumber+1));
 		
 		for (int i=0; i<citiesCount; i++)
-			list.add(new SimpleStringProperty("0"));
+			row.cells.add(new SimpleStringProperty("0"));
 		
-		data.add(list);
+		data.add(row);
 		
 		addColumn();
 	}
@@ -86,23 +86,22 @@ public class MainWindowController
 		for (int i=0; i<data.size(); i++)
 		{
 			if (i == data.size()-1)
-				data.get(i).add(new SimpleStringProperty("M"));
+				data.get(i).cells.add(new SimpleStringProperty("M"));
 			else
-				data.get(i).add(new SimpleStringProperty("0"));
+				data.get(i).cells.add(new SimpleStringProperty("0"));
 		}
-				
-		titles.add("A" + (lastCityNumber+1));
+						
+		table.getColumns().add(createColumn("A" + (lastCityNumber+1), citiesCount));
+		
 		lastCityNumber++;
 		citiesCount ++;
-				
-		table.getColumns().add(createColumn(titles.get(citiesCount), citiesCount));
 	}
 	
-	private TableColumn<List<SimpleStringProperty>, String> createColumn(String title, final int n)
+	private TableColumn<TableRow, String> createColumn(String title, final int n)
 	{
-		TableColumn<List<SimpleStringProperty>, String> c = new TableColumn<>(title);
+		TableColumn<TableRow, String> c = new TableColumn<>(title);
 		
-    	c.setCellValueFactory(cellData -> cellData.getValue().get(n));    	
+    	c.setCellValueFactory(cellData -> (n == -1) ? cellData.getValue().title : cellData.getValue().cells.get(n));    	
     	c.setCellFactory(TextFieldTableCell.forTableColumn());
     	
     	c.setSortable(false);
@@ -115,25 +114,46 @@ public class MainWindowController
 		if (index == 0)
 			return;
 		
+		for (TableRow row: data)
+		{
+			row.cells.remove(index-1);
+		}
+		
 		table.getColumns().remove(index);
 	}
 		
 	private void tableToString()
 	{
-		for(List<SimpleStringProperty> list: data)
+		for(TableRow row: data)
 		{
-			String row = "";
-			for(SimpleStringProperty s: list)
-				row = row + s.get() + " ";
+			String res = row.title.get() + " ";
+			for(SimpleStringProperty s: row.cells)
+				res = res + s.get() + " ";
 			
-			log(row);
+			log(res);
 		}
 	}
 	
-	@FXML private void onAddClicked()
+	private void toggleCell(int x, int y)
+	{
+		if (y == 0)
+			return;
+		
+	}
+	
+	private boolean isCellDisabled(int x, int y)
+	{
+		return false;
+	}
+	
+	@FXML private void onAddClick()
 	{
 		addItem();
-		tableToString();
+	}
+	
+	@FXML private void onClearClick()
+	{
+		logText.clear();
 	}
 	
 	private void log(String text)

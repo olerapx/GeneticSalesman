@@ -9,6 +9,7 @@
    <children>
       <TextArea fx:id="logText" editable="false" layoutX="386.0" layoutY="14.0" prefHeight="500.0" prefWidth="400.0" />
       <TableView fx:id="table" editable="true" layoutX="9.0" layoutY="14.0" prefHeight="500.0" prefWidth="372.0" />
-      <Button layoutX="14.0" layoutY="524.0" mnemonicParsing="false" onAction="#onAddClicked" text="Добавить" />
+      <Button layoutX="14.0" layoutY="524.0" mnemonicParsing="false" onAction="#onAddClick" text="Добавить" />
+      <Button layoutX="720.0" layoutY="524.0" mnemonicParsing="false" onAction="#onClearClick" text="Очистить" />
    </children>
 </AnchorPane>
