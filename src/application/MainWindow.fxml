@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
 <AnchorPane minHeight="600.0" minWidth="800.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainWindowController">
    <children>
       <TextArea fx:id="logText" editable="false" layoutX="386.0" layoutY="14.0" prefHeight="500.0" prefWidth="400.0" />
-      <TableView fx:id="table" editable="true" layoutX="9.0" layoutY="14.0" prefHeight="500.0" prefWidth="372.0" />
+      <TableView fx:id="table" editable="true" layoutX="9.0" layoutY="14.0" prefHeight="500.0" prefWidth="372.0" stylesheets="@application.css" />
       <Button layoutX="14.0" layoutY="524.0" mnemonicParsing="false" onAction="#onAddClick" text="Добавить" />
       <Button layoutX="720.0" layoutY="524.0" mnemonicParsing="false" onAction="#onClearClick" text="Очистить" />
+      <Button layoutX="92.0" layoutY="524.0" mnemonicParsing="false" onAction="#onRandomFillClick" text="Заполнить случайно" />
+      <Label layoutX="92.0" layoutY="559.0" text="Макс значение" />
+      <TextField fx:id="maxDistanceText" alignment="CENTER" layoutX="184.0" layoutY="555.0" prefHeight="25.0" prefWidth="53.0" text="1000" />
    </children>
 </AnchorPane>
