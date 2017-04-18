@@ -12,7 +12,8 @@ public class Main extends Application
 	@Override
 	public void start(Stage primaryStage) 
 	{
-		try {
+		try 
+		{
 			AnchorPane root = (AnchorPane) FXMLLoader.load(getClass().getResource("MainWindow.fxml"));
 			Scene scene = new Scene(root, 800, 600);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
@@ -29,7 +30,8 @@ public class Main extends Application
 		}
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) 
+	{
 		launch(args);
 	}
 }
