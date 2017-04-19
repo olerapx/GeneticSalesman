@@ -59,7 +59,7 @@ public class GeneticAlgorithm
 		this.duplicationAndDeletionChance = duplicationAndDeletionChance;
 	}
 	
-	public void startHolland()
+	public Population startHolland()
 	{	
 		Population p = new Population(population.getChromosomes());		
 		rand = new Random();
@@ -88,12 +88,14 @@ public class GeneticAlgorithm
 			sendLog.emit("Результат");
 			logPopulationWithFunctionValue(p);
 		}
+		
+		return p;
 	}
 	
 	private void logPopulationWithFunctionValue(Population p)
 	{
 		sendPopulation.emit(p);
-		Double maxValue = Double.MIN_VALUE;		
+		Double maxValue = Double.NEGATIVE_INFINITY;		
 		Double averageValue = 0.0;
 		
 		for (Chromosome c: p.getChromosomes())
@@ -112,7 +114,7 @@ public class GeneticAlgorithm
 		if (NumberGenerator.rollWithChance(rand, crossoverChance))
 		{
 			sendLog.emit("Кроссинговер");
-			p = CrossoverOperator.singlePointCrossover(p.getChromosomes().get(firstIndex), p.getChromosomes().get(secondIndex));
+			p = CrossoverOperator.orderedCrossover(p.getChromosomes().get(firstIndex), p.getChromosomes().get(secondIndex));
 			sendPopulation.emit(p);
 		}
 		
@@ -174,7 +176,7 @@ public class GeneticAlgorithm
 		return p;
 	}	
 	
-	public void startGoldberg()
+	public Population startGoldberg()
 	{	
 		Population p = new Population(population.getChromosomes());		
 		rand = new Random();
@@ -202,9 +204,11 @@ public class GeneticAlgorithm
 			sendLog.emit("Результат");
 			logPopulationWithFunctionValue(p);
 		}
+		
+		return p;
 	}
 	
-	public void startDavis()
+	public Population startDavis()
 	{
 		Population p = new Population(population.getChromosomes());		
 		rand = new Random();
@@ -225,7 +229,7 @@ public class GeneticAlgorithm
 			{
 				sendLog.emit("Время вышло");
 				logPopulationWithFunctionValue(p);
-				return;
+				return p;
 			}
 			
 			int count = NumberGenerator.getRandomNumberInRange(rand, 2, p.getChromosomes().size() - 1);
@@ -256,7 +260,7 @@ public class GeneticAlgorithm
 		}
 	}
 	
-	public void startModded()
+	public Population startModded()
 	{
 		Population p = new Population(population.getChromosomes());		
 		rand = new Random();
@@ -288,6 +292,8 @@ public class GeneticAlgorithm
 			sendLog.emit("Результат");
 			logPopulationWithFunctionValue(p);
 		}
+		
+		return p;
 	}
 	
 	private boolean isTimeout(LocalTime startTime)
@@ -326,4 +332,5 @@ public class GeneticAlgorithm
 		
 		return c;
 	}
+
 }

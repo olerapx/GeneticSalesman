@@ -5,7 +5,10 @@ import java.util.Random;
 import genetic.algorithms.GeneticAlgorithm;
 import genetic.models.chromosome.Chromosome;
 import genetic.models.chromosome.ChromosomeType;
+import genetic.models.chromosome.FunctionComparator;
 import genetic.models.function.ObjectiveFunction;
+import genetic.models.gene.Gene;
+import genetic.models.gene.NumericGene;
 import genetic.models.population.Population;
 import genetic.operators.PopulationGenerator;
 import javafx.beans.property.SimpleStringProperty;
@@ -13,10 +16,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -34,8 +34,6 @@ public class MainWindowController
 	@FXML private TextArea logText;
 	@FXML private TableView<TableRow> table;
 	@FXML private TextField maxDistanceText;
-	
-	@FXML private ComboBox<TableRow> startCityBox;
 	
 	@FXML private TextField crossoverChanceText;
 	@FXML private TextField inversionChanceText;
@@ -114,8 +112,6 @@ public class MainWindowController
 		table.setContextMenu(cellContext);
 		table.getSelectionModel().setCellSelectionEnabled(true);
 		
-		initStartCityBox();
-		
 		TableColumn<TableRow, String> headerColumn = createColumn("Город", 0);
 		headerColumn.setEditable(false);
 		
@@ -123,48 +119,8 @@ public class MainWindowController
 		
 		for (int i=0; i<3; i++)
 			addItem();
-		
-		startCityBox.getSelectionModel().select(0);
 	}
-	
-	private void initStartCityBox()
-	{
-		startCityBox.setItems(data);
-		startCityBox.setButtonCell(new ListCell<TableRow>() 
-		{
-	        @Override
-	        protected void updateItem(TableRow t, boolean empty) 
-	        {
-	            super.updateItem(t, empty);
-	            if (empty)
-	                setText("");
-	            else
-	                setText(t.title.get());
-	        }
-	    });
-		
-		startCityBox.setCellFactory(new Callback<ListView<TableRow>, ListCell<TableRow>>() 
-		{
-	        @Override
-	        public ListCell<TableRow> call(ListView<TableRow> p) 
-	        {
-	            ListCell<TableRow> cell = new ListCell<TableRow>() 
-	            {
-	                @Override
-	                protected void updateItem(TableRow item, boolean empty)
-	                {
-	                    super.updateItem(item, empty);
-	                    if (empty) 
-	                        setText("");
-	                    else 
-	                        setText(item.title.get());
-	                }
-	            };
-	            return cell;
-	        }
-	    });
-	}
-	
+
 	private void addItem()
 	{
 		TableRow row = new TableRow();
@@ -268,19 +224,7 @@ public class MainWindowController
 	{
 		addItem();
 	}
-	
-	private void tableToString()
-	{
-		for(TableRow row: data)
-		{
-			String res = row.title.get() + " ";
-			for(SimpleStringProperty s: row.cells)
-				res = res + s.get() + " ";
 			
-			log(res);
-		}
-	}
-		
 	@FXML private void onClearClick()
 	{
 		logText.clear();
@@ -313,7 +257,7 @@ public class MainWindowController
 			
 			createFunction();
 			
-			log("Исходная популяция");
+			log("\nИСХОДНАЯ ПОПУЛЯЦИЯ\n");
 			log(population);
 		}
 		catch (Exception ex)
@@ -324,7 +268,28 @@ public class MainWindowController
 	
 	private void createFunction()
 	{
-		//TODO
+		String func = "var matrix = [";
+		for(TableRow row: data)
+		{
+			func += "[";
+			
+			for (SimpleStringProperty s: row.cells)
+			{
+				String str = (containsWay(s.get())? s.get(): "Infinity");
+				func += str + ", ";
+			}
+			
+			func += "],\n";
+		}
+		func += "];\n";
+		
+		func += "y = -(";
+		
+		for (int i=1; i<data.size(); i++)
+			func += "matrix[x"+(i)+"][x"+(i+1)+"]+";
+		func += "matrix[x"+data.size()+"][x1]);";
+		
+		function = new ObjectiveFunction(func);
 	}
 	
 	private void log(String text)
@@ -358,7 +323,11 @@ public class MainWindowController
 	{
 		try
 		{
-			GeneticAlgorithm algo = new GeneticAlgorithm(population, function, Integer.parseInt(iterationsNumberText.getText()), "0:0:0",
+			log("\nСТАРТ\n");
+			log("Матрица городов:");
+			log(tableToString());
+			
+			GeneticAlgorithm algo = new GeneticAlgorithm(population, function, Integer.parseInt(iterationsNumberText.getText()), "00:00:00",
 					Double.parseDouble(crossoverChanceText.getText()), Double.parseDouble(inversionChanceText.getText()), 
 					Double.parseDouble(mutationChanceText.getText()), 0.0, 0.0);
 			
@@ -366,12 +335,52 @@ public class MainWindowController
 			algo.sendChromosome.connect(this::onChromosomeReceived);
 			algo.sendPopulation.connect(this::onPopulationReceived);
 			
-			algo.startHolland();	
+			Population p = algo.startHolland();	
+			
+			p.getChromosomes().sort(new FunctionComparator(function));
+			Chromosome optimal = p.getChromosomes().get(p.getChromosomes().size()-1);
+			
+			log("\nРЕЗУЛЬТАТ\n");
+			
+			double val = -function.calculate(optimal);
+			if (val == Double.POSITIVE_INFINITY)
+			{
+				log("Пути не существует");
+				return;
+			}
+			
+			log("Оптимальный путь:");
+			String way="";
+			for(Gene g: optimal.getGenes())
+				way += data.get(((NumericGene)g).getValue()).title.get() + " -> ";
+			way+=data.get(((NumericGene)optimal.getGenes().get(0)).getValue()).title.get();
+			
+			log(way);
+			
+			log("Длина пути:");
+			log(String.valueOf(val));
 		}
 		catch(Exception e)
 		{
 			log (e.getLocalizedMessage());
 		}
+	}
+	
+	private String tableToString()
+	{
+		String res = "";
+		for(TableColumn<TableRow, ?> col: table.getColumns())
+			res += String.format("%1$10s", col.getText()) + "\t";
+		res += "\n";
+		
+		for(TableRow row: data)
+		{
+			res += String.format("%1$10s", row.title.get()) + "\t";
+			for(SimpleStringProperty s: row.cells)
+				res = res + String.format("%1$10s", s.get()) + "\t";
+			res +="\n";
+		}
+		return res;
 	}
 	
 	private final void onLogReceived(String text)
