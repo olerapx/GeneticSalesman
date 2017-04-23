@@ -70,6 +70,8 @@ public class GeneticAlgorithm
 		sendLog.emit("Начальная популяция");
 		logPopulationWithFunctionValue(p);
 		
+		LocalTime startTime = LocalTime.now();
+		
 		for (int i=0; i<iterationCount; i++)
 		{
 			sendLog.emit("Итерация №" + (i+1));		
@@ -88,6 +90,9 @@ public class GeneticAlgorithm
 			sendLog.emit("Результат");
 			logPopulationWithFunctionValue(p);
 		}
+		
+		Duration currentDuration = Duration.between(startTime, LocalTime.now());
+		sendLog.emit("\nЗатраченное время: " + currentDuration.toMillis() + "мс");
 		
 		return p;
 	}
@@ -187,6 +192,8 @@ public class GeneticAlgorithm
 		sendLog.emit("Начальная популяция");
 		logPopulationWithFunctionValue(p);
 		
+		LocalTime startTime = LocalTime.now();
+		
 		for (int i=0; i<iterationCount; i++)
 		{
 			sendLog.emit("Итерация №" + (i+1));		
@@ -204,6 +211,9 @@ public class GeneticAlgorithm
 			sendLog.emit("Результат");
 			logPopulationWithFunctionValue(p);
 		}
+		
+		Duration currentDuration = Duration.between(startTime, LocalTime.now());
+		sendLog.emit("\nЗатраченное время: " + currentDuration.toMillis() + "мс");
 		
 		return p;
 	}
@@ -272,6 +282,8 @@ public class GeneticAlgorithm
 		sendLog.emit("Начальная популяция");
 		logPopulationWithFunctionValue(p);
 		
+		LocalTime startTime = LocalTime.now();
+		
 		for (int i=0; i<iterationCount; i++)
 		{
 			sendLog.emit("Итерация №" + (i+1));		
@@ -292,6 +304,9 @@ public class GeneticAlgorithm
 			sendLog.emit("Результат");
 			logPopulationWithFunctionValue(p);
 		}
+		
+		Duration currentDuration = Duration.between(startTime, LocalTime.now());
+		sendLog.emit("\nЗатраченное время: " + currentDuration.toMillis() + "мс");
 		
 		return p;
 	}
