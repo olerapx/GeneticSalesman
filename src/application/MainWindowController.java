@@ -75,8 +75,8 @@ public class MainWindowController
 		
 		table.getItems().remove(index-1);	
 		
-		for(TableRow trow: data)
-			trow.cells.remove(index-1);
+		for(TableRow row: data)
+			row.cells.remove(index-1);
 		
 		table.getColumns().remove(index);
 		
@@ -93,8 +93,8 @@ public class MainWindowController
 	{		
 		table.getItems().remove(index);	
 		
-	for(TableRow trow: data)
-			trow.cells.remove(index);
+		for(TableRow row: data)
+				row.cells.remove(index);
 		
 		table.getColumns().remove(index+1);
 		
@@ -153,8 +153,29 @@ public class MainWindowController
 	private TableColumn<TableRow, String> createColumn(String title, final int n)
 	{
 		TableColumn<TableRow, String> c = new TableColumn<>(title);
+		
 		setCellValueFactory(c, n);
+		setCellFactory(c);
+		
+    	c.setSortable(false);
+		
+		return c;
+	}
 	
+	private void setCellValueFactory(TableColumn<TableRow, String> c, int n)
+	{
+    	c.setCellValueFactory(cellData -> 
+    	{
+    		if (n == 0)
+    			return cellData.getValue().title;
+    		else if (n < cellData.getValue().cells.size()+1)
+    			return cellData.getValue().cells.get(n-1);
+    		else return new SimpleStringProperty("");
+    	});
+	}
+	
+	private void setCellFactory(TableColumn<TableRow, String> c)
+	{
         c.setCellFactory(new Callback<TableColumn<TableRow, String>, TableCell<TableRow, String>>() 
         {
 			@Override
@@ -193,22 +214,6 @@ public class MainWindowController
 				};
 			}
        });
-    	
-    	c.setSortable(false);
-		
-		return c;
-	}
-	
-	private void setCellValueFactory(TableColumn<TableRow, String> c, int n)
-	{
-    	c.setCellValueFactory(cellData -> 
-    	{
-    		if (n == 0)
-    			return cellData.getValue().title;
-    		else if (n < cellData.getValue().cells.size()+1)
-    			return cellData.getValue().cells.get(n-1);
-    		else return new SimpleStringProperty("");
-    	});
 	}
 		
 	private boolean containsWay(String str)
@@ -238,6 +243,7 @@ public class MainWindowController
 	private void randomFill(int max)
 	{
 		Random rand = new Random();
+		
 		for(TableRow row: data)
 			for(SimpleStringProperty s: row.cells)
 			{
