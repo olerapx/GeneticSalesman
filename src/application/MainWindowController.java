@@ -365,6 +365,10 @@ public class MainWindowController
 			
 			log("Длина пути:");
 			log(String.valueOf(val));
+			
+			algo.sendLog.clear();
+			algo.sendChromosome.clear();
+			algo.sendPopulation.clear();
 		}
 		catch(Exception e)
 		{
